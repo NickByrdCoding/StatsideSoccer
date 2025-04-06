@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <title>Flask Animation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <h1 id="page-header">Statside Soccer</h1>
+
+  <div id="display">
+
+    <div class="tab-navigation">
+      <div class="tab" data-tab="general-play" data-value="test">General Play</div>
+      <div class="tab" data-tab="under-pressure" data-value="Pressure">Under Pressure</div>
+      <div class="tab" data-tab="threatening-play" data-value="Threat">Threatening Play</div>
+    </div>
+    <div id="page-title"><h2>Orlando Pride vs. Chicago Red Stars</h2></div>
+  <article id="data-article-main"></article>
+  <article id="data-article">
+  </article>
+
+  </div>
+  <div id="best-pass"></div>
+  <h2 id="name-table-data"></h2>
+<div id="table-data"></div>
+
+  <script>
+    let currentVal = "test"
+    let currentTest = 1;
+    let aBool = false;
+    let bestPass = '';
+
+
+    function updateBestPassDisplay() {
+  if (currentVal === "Pressure" && currentTest === 7) {
+    bestPass = `<h3>Alternate Passing</h3>During the play, our data suggested that there was an alternate pass that could've led to a more threatening position.`;
+    document.querySelector("#best-pass").innerHTML = bestPass;
+  } else {
+    bestPass = '';
+    document.querySelector("#best-pass").innerHTML = bestPass;
+  }
+}
+    document.addEventListener("DOMContentLoaded", () => {
+      if (currentVal != "test") {
+        aBool = true;
+        loadArticleData(aBool);
+      } else {
+        loadArticleData(aBool);
+      }
+      setupIframe();
+    });
+
+    function setupIframe() {
+      const iframe = document.getElementById("animation-iframe");
+      if (!iframe) return;
+
+      iframe.onload = () => {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        const images = iframeDoc.querySelectorAll("img");
+
+        images.forEach((img) => {
+          img.height = 550;
+        });
+      };
+    }
+
+    function changeDisplay(amt) {
+      if (currentVal != "test") {
+        aBool = true;
+        loadArticleData(aBool);
+      } else {
+        aBool = false;
+        loadArticleData(aBool);
+      }
+      loadArticleData(aBool);
+      currentTest += amt;
+      if (currentTest == 1 && currentVal == "Threat") {
+        currentTest = 2;
+      }
+      if (currentTest < 1) currentTest = 1;
+      // if (currentTest > 5) currentTest = 5;
+      updateBestPassDisplay();
+      const newSrc = `{{ url_for('static', filename='') }}${currentVal}${currentTest}.html`;
+      console.log(newSrc);
+      document.getElementById("animation-holder").innerHTML =
+        `<iframe id="animation-iframe" src="${newSrc}"></iframe>`;
+
+      setupIframe();
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function () {
+      currentVal = this.dataset.value;
+      console.log('Selected tab:', currentVal);
+      changeDisplay(-1);
+    });});
+
+    function loadArticleData(aBool) {
+      console.log(currentVal);
+      summaryData = '';
+      insightData = '';
+      tableData = '';
+      if (currentVal == 'Pressure') {
+        document.querySelector("#name-table-data").innerHTML = `<h3>Under Pressure Analysis</h3>`;
+        currentVal = 'Pressure';
+        summaryData = "The team's ability to escape pressure is inconsistent, with zone 10 being the most frequent starting point for both successful and failed escapes. Successful escapes often involve circulation within zone 10, or transitions from zone 10 to zones 7 and 8 in the middle third. The average possession duration for a successful escape is approximately 8.7 seconds, with a high one-touch pass ratio of 50%. In contrast, failed escapes have a much lower one-touch pass ratio (25%) and begin almost exclusively from zone 10. Angelina is the key player involved in escaping pressure, with consistent passing combinations with K. Abello. The team rarely switches play during pressure situations, with only one instance recorded."
+        insightData = `<ol>
+          <li>Zone 10 is a Hotspot: The team frequently finds itself under pressure in zone 10, and it's the starting point for both successful and unsuccessful attempts to break the pressure. This suggests issues with either initial buildup play or defensive transitions.</li>
+          <li>
+          Circulation and Short Passes: Successful escapes from pressure often involve short, quick passes, as evidenced by the high one-touch pass ratio and the passing chains from zone 10 to other zones.
+          </li>
+          <li>
+              Angelina is Key Under Pressure: Angelina is the most involved player in escaping pressure, indicating her importance in receiving and distributing the ball under duress. The data suggests she is often linking up with K. Abello.
+          </li>
+          <li>
+              Limited Switching: The lack of switching play suggests a possible predictability in the team's attempts to escape pressure, or a lack of options on the far side of the field.</div>
+          </li>
+
+        </ol>`;
+        tableData = `
+        <h3> Pressure Situations </h3>
+        <p><strong>High Pressure Situations:</strong> 10</p>
+        <p><strong>Pressure Situations Successfully Escaped: </strong> 9</p>
+        <p><strong>Pressure Situations Unsuccessfully Escaped: </strong> 1</p>
+        <p><strong>Number of switches while escaping pressure:</strong> 1</p>
+        <h3>Common Zone Pairings in Successfully Escaped Pressures</h3>
+        <h4>Build up often passes through these zone pairs in order while escaping pressure</h4>
+<table border="1">
+  <tr><th>Most Common Zone Sequences</th></tr>
+  <tr><td>10 → 10</td></tr>
+  <tr><td>10 → 7</td></tr>
+  <tr><td>10 → 8</td></tr>
+</table>
+
+<h3>Common Zone Pairings in Failed Escaped Pressures</h3>
+<h4>Build up often passes through these zone pairs in order while failing to escape pressure</h4>
+<table border="1">
+  <tr><th>Most Common Zone Sequences</th></tr>
+  <tr><td>10 → 10</td></tr>
+</table>
+
+<h3>Most Common Zones of Pressure</h3>
+<h4>The team was often under pressure in these zones</h4>
+<table border="1">
+  <tr><th>Zone</th><th>Successful</th><th>Failed</th></tr>
+  <tr><td>10</td><td>9</td><td>4</td></tr>
+  <tr><td>8</td><td>6</td><td>—</td></tr>
+  <tr><td>2</td><td>5</td><td>—</td></tr>
+</table>
+
+<h3>Common Player Sequences Under Pressure</h3>
+<h4>These players often combine to attempt to escape pressure</h4>
+<table border="1">
+  <tr><th>Chain</th><th>Successful</th><th>Failed</th></tr>
+  <tr><td>K. Strom → K. Abello</td><td>2</td><td>—</td></tr>
+  <tr><td>K. Abello → Angelina</td><td>2</td><td>—</td></tr>
+  <tr><td>Angelina → E. Madril Sams</td><td>2</td><td>—</td></tr>
+  <tr><td>Marta → C. Dyke</td><td>—</td><td>1</td></tr>
+  <tr><td>C. Dyke → Angelina</td><td>—</td><td>1</td></tr>
+  <tr><td>Angelina → C. Dyke</td><td>—</td><td>1</td></tr>
+</table>
+
+<h3>Individual Player Contributions Under Pressure</h3>
+<h4>These players are most often involved in high pressure situations</h4>
+<table border="1">
+  <tr><th>Player</th><th>Successful</th><th>Failed</th></tr>
+  <tr><td>Angelina</td><td>13</td><td>2</td></tr>
+  <tr><td>B. Banda</td><td>7</td><td>—</td></tr>
+  <tr><td>Marta</td><td>7</td><td>1</td></tr>
+  <tr><td>C. Dyke</td><td>—</td><td>4</td></tr>
+</table>
+
+<h3>Tempo Metrics</h3>
+<table border="1">
+  <tr>
+    <th>Metric</th>
+    <th>Successful</th>
+    <th>Failed</th>
+  </tr>
+  <tr>
+    <td>Avg Duration (sec) </td>
+    <td>8.68</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>One-Touch Ratio</td>
+    <td>0.50</td>
+    <td>0.25</td>
+  </tr>
+</table>
+</div>`
+document.querySelector("#table-data").innerHTML = tableData
+      } else if (currentVal == 'Threat') {
+        document.querySelector("#name-table-data").innerHTML = ``;
+        summaryData = "The team's threatening attacks often culminate in zone 6, indicating a tendency to focus attacks towards the left side of the final third. Attacking sequences typically start in zones 12, 10, and 6, progressing into the final third. Sequences average approximately 20 seconds in duration, with a lower one-touch pass ratio of 30% compared to escaping pressure. Marta is a crucial player in these attacking phases, being heavily involved in passing chains with Adriana and K. Abello. A small fraction of threatening possessions involve a switch of play."
+        insightData = `<ol>
+          <li>Zone 6 as a Target: The high frequency of attacks ending in Zone 6 suggests a tactical focus on that area, potentially aiming for crosses, cutbacks, or shots from that part of the field.</li>
+          <li>
+          Sustained Attacks: The longer average possession duration of threatening attacks (20 seconds) indicates a more deliberate and sustained attacking approach, potentially involving more intricate passing sequences.
+          </li>
+          <li>
+              Marta as a Playmaker: Marta is the central figure in creating threatening situations, facilitating plays with teammates such as Adriana and K. Abello.
+          </li>
+          <li>
+              Limited Switches: Similar to escaping pressure, switches are not a frequent feature of attacking play</div>
+          </li>
+
+        </ol>`;
+
+
+  document.querySelector("#table-data").innerHTML = `<h2>Threat Analysis</h2>
+  <h3> Threatening Situations </h3>
+        <p><strong>Threatening Plays:</strong> 17</p>
+        <p><strong>Number of switches while escaping pressure:</strong> 5</p>
+        <h3>Common Zone Pairings in Threatening Attack</h3>
+        <h4>Build up often passes through these zone pairs in order while creating chances</h4>
+  <table border="1">
+    <tr><th>Most Common Zone Sequences</th></tr>
+    <tr><td>12 → 11</td></tr>
+    <tr><td>10 → 15</td></tr>
+    <tr><td>6 → 6</td></tr>
+  </table>
+
+ <h3>Most Common Zones of Threat</h3>
+<h4>The team was often dangerous in these zones</h4>
+  <table border="1">
+    <tr><th>Most Common Zones </th></tr>
+    <tr><td>6</td></tr>
+  </table>
+
+  <h3>Common Player Sequences Under Pressure</h3>
+<h4>These players often combine to attempt to create dangerous opportunities</h4>
+  <table border="1">
+    <tr><th>Chain</th></tr>
+    <tr><td>Marta → K. Abello</td></tr>
+    <tr><td>B. Banda → Adriana</td></tr>
+    <tr><td>Adriana → Marta</td></tr>
+  </table>
+
+  <h3>Individual Player Contributions Under Pressure</h3>
+<h4>These players are most often involved in creating dangerous chances</h4>
+  <table border="1">
+    <tr><th>Player</th></tr>
+    <tr><td>Marta</td></tr>
+    <tr><td>Adriana</td></tr>
+    <tr><td>K. Abello</td></tr>
+  </table>
+
+  <h3>Tempo Metrics</h3>
+  <table border="1">
+    <tr><th>Metric</th><th>Value</th></tr>
+    <tr><td>Avg Duration (sec) </td><td>20.22</td></tr>
+    <tr><td>One-Touch Ratio</td><td>0.31</td></tr>
+  </table>
+  `;
+
+      }
+      if (aBool) {
+        document.querySelector("#data-article-main").innerHTML = '';
+        document.querySelector("#data-article").innerHTML = `<div id="animation-total">
+      <div id="animation-holder">
+        <iframe id="animation-iframe" src="{{ url_for('static', filename='test1.html') }}"></iframe>
+      </div>
+      <div class="arrow-container">
+        <div class="arrow" onclick="changeDisplay(-1)">&#8592;</div>
+        <div class="arrow" onclick="changeDisplay(1)">&#8594;</div>
+      </div>
+    </div>
+    <div id="moment-details">
+      <h2>${currentVal} Analysis</h2>
+      <h3 id="key-moment-head-text">Summary:</h3>
+      <div>${summaryData}</div>
+      <h3>Insights:</h3>
+      <div>${insightData}</div>
+    </div>`;
+    
+      } else {
+        document.querySelector("#data-article").innerHTML = '';
+        document.querySelector("#table-data").innerHTML = '';
+        document.querySelector("#name-table-data").innerHTML = '';
+        document.querySelector("#data-article-main").innerHTML = `
+        <div id="zone-description">
+            <h1>Data Grid</h1>
+            <div class="key-container">
+          <img src="{{ url_for('static', filename='Zones.png') }}" height="500">
+          </div>
+        </div>
+        <div id="poss-heatmap">
+            <h1>Time of Possession Heatmap</h1>
+            <div class="key-container">
+            <div class="gradient-bar-poss"></div>
+          <div class="labels">
+            <div>Low Frequency</div>
+            <div>Medium-Low</div>
+            <div>Medium</div>
+            <div>Medium-High</div>
+            <div>High Frequency</div>
+          </div>
+          <img src="{{ url_for('static', filename='TimeInZones.png') }}" height="450">
+          </div>
+        </div>
+        <div id="pass-heatmap">
+          <h1>Pass Frequency Heatmap</h1>
+          <div class="key-container">
+          <div class="gradient-bar-pass"></div>
+          <div class="labels">
+            <div>Low Frequency</div>
+            <div>Medium-Low</div>
+            <div>Medium</div>
+            <div>Medium-High</div>
+            <div>High Frequency</div>
+          </div>
+          <img src="{{ url_for('static', filename='passFrequency.png') }}" height="350">
+          </div>
+        </div>
+        <div id="threat-heatmap">
+          <h1>Expected Threat Heatmap</h1>
+          <div class="key-container">
+          <div class="gradient-bar"></div>
+          <div class="labels">
+            <div>Low Threat</div>
+            <div>Medium-Low</div>
+            <div>Medium</div>
+            <div>Medium-High</div>
+            <div>High Threat</div>
+          </div>
+        </div>
+        <img src="{{ url_for('static', filename='threatHeatMap.png') }}" height="350"></div>`;
+      }
+    }
+  </script>
+</body>
+
+</html>
